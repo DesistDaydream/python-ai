@@ -10,7 +10,9 @@ model_name = r"D:\appdata\huggingface\hub\models--Qwen--Qwen3-0.6B\snapshots\c18
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 print(tokenizer)  # 实例化的分词器来源于 tokenizer.json 和 tokenizer_config.json 文件
 # 加载模型。从模型目录中查找 model.safetensors 或 pytorch_model.bin 权重文件，及其相关配置文件
-model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto")
+model = AutoModelForCausalLM.from_pretrained(
+    model_name, torch_dtype="auto", device_map="auto"
+)
 
 
 # -------- 准备要输入给模型的文本 --------
