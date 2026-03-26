@@ -1,4 +1,5 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import PreTrainedTokenizerBase
 
 # model_name = "Qwen/Qwen3-0.6B"
 model_name = r"D:\appdata\huggingface\hub\models--Qwen--Qwen3-0.6B\snapshots\c1899de289a04d12100db370d81485cdf75e47ca"
@@ -7,9 +8,11 @@ model_name = r"D:\appdata\huggingface\hub\models--Qwen--Qwen3-0.6B\snapshots\c18
 # 分词器可以实现如下两个功能
 # - 将用户输入转换为 token 序列。(可读文本 ——> token 序列)
 # - 将模型输出转换为可读文本。（token 序列 ——> 可读文本）
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer: PreTrainedTokenizerBase = AutoTokenizer.from_pretrained(model_name)
 print(tokenizer)  # 实例化的分词器来源于 tokenizer.json 和 tokenizer_config.json 文件
 # 加载模型。从模型目录中查找 model.safetensors 或 pytorch_model.bin 权重文件，及其相关配置文件
+# 模型加载完成后，根据 device_map 参数，会自动将模型移动到指定的设备（如 GPU 或 CPU）（device_map 参数依赖 accelerate 包）
+# 不加 device_map 参数，默认会将模型加载到 CPU 上。
 model = AutoModelForCausalLM.from_pretrained(
     model_name, torch_dtype="auto", device_map="auto"
 )
@@ -35,12 +38,12 @@ text = tokenizer.apply_chat_template(
 print(text)
 # 将渲染后的文本转为包含 Tensor(张量) 的字典。就像这样：
 # {'input_ids': tensor([[151644,    872,    198, 108386, 151645,    198]]), 'attention_mask': tensor([[1, 1, 1, 1, 1, 1]])}
-model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
+model_inputs = tokenizer.__call__([text], return_tensors="pt").to(model.device)  # type: ignore
 print(model_inputs)
 
 # -------- ！！！模型进行推理！！！ --------
 # 输入 Tensor，输出 Tensor。这是模型进行计算（i.e. 推理）的过程，也是整个代码，耗费时间最长的一步。
-generated_ids = model.generate(**model_inputs, max_new_tokens=32768)
+generated_ids = model.generate(**model_inputs, max_new_tokens=32768)  # type: ignore
 print(generated_ids)
 # 去掉用户输入的部分留下模型生成的部分。生成了 TokenID 序列。
 output_ids = generated_ids[0][len(model_inputs.input_ids[0]) :].tolist()
