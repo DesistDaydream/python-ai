@@ -1,5 +1,6 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers import PreTrainedTokenizerBase
+from transformers import BatchEncoding
 
 # model_name = "Qwen/Qwen3-0.6B"
 model_name = r"D:\appdata\huggingface\hub\models--Qwen--Qwen3-0.6B\snapshots\c1899de289a04d12100db370d81485cdf75e47ca"
@@ -35,30 +36,29 @@ messages = [
     {"role": "user", "content": prompt},
 ]
 
-text = tokenizer.apply_chat_template(
+
+model_inputs: BatchEncoding = tokenizer.apply_chat_template(
     messages,
     # 将可用的工具添加到模型输入中
     tools=tools,
-    tokenize=False,
-    add_generation_prompt=True,
+    tokenize=True,
+    return_tensors="pt",
+    add_generation_prompt=False,
     enable_thinking=True,
-)
-print(text)
-model_inputs = tokenizer.__call__([text], return_tensors="pt").to(model.device)  # type: ignore
-print(model_inputs)
+).to(model.device)  # type: ignore
 
-generated_ids = model.generate(**model_inputs, max_new_tokens=32768)  # type: ignore
-print(generated_ids)
-output_ids = generated_ids[0][len(model_inputs.input_ids[0]) :].tolist()
+output_ids = model.generate(**model_inputs, max_new_tokens=32768)  # type: ignore
 print(output_ids)
 
-output_text = tokenizer.decode(
-    output_ids,
-    skip_special_tokens=False,
+# 解码的参数不使用 output_ids[0][len(model_inputs["input_ids"][0]) :]，因为要检查 tool_call 是否存在
+assistant_reply = tokenizer.decode(
+    output_ids[0][len(model_inputs["input_ids"][0]) :],  # type: ignore
+    skip_special_tokens=True,
 )
-print(output_text)
+print(assistant_reply)
+
 
 # 若 LLM 判断需要使用工具，将会返回 tool_call 标签包裹的内容。输出效果类似下面这样：
 # <tool_call>
 # {"name": "get_weather", "arguments": {"city": "北京"}}
-# </tool_call><|im_end|>
+# </tool_call>
