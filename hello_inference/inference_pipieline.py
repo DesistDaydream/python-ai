@@ -30,4 +30,4 @@ gen_config = GenerationConfig(
     temperature=0.7,
 )
 response = generator(messages, generation_config=gen_config)
-print(response[0]["generated_text"][-1]["content"])
+print("问题: {}\n回答: {}".format(prompt, response[0]["generated_text"][-1]["content"]))
