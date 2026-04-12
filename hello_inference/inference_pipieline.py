@@ -3,7 +3,9 @@ from transformers import GenerationConfig
 
 # https://huggingface.co/Qwen/Qwen3-0.6B
 # model_name = "Qwen/Qwen3-0.6B"
-model_path = r"D:\appdata\huggingface\hub\models--Qwen--Qwen3-0.6B\snapshots\c1899de289a04d12100db370d81485cdf75e47ca"
+# model_path = r"D:\appdata\huggingface\hub\models--Qwen--Qwen3-0.6B\snapshots\c1899de289a04d12100db370d81485cdf75e47ca"
+# model_path = r"D:\appdata\models\desistdaydream"
+model_path = "/mnt/d/appdata/models/desistdaydream/"
 
 prompt = "hi, i'm DesistDaydream"
 messages = [
