@@ -21,6 +21,10 @@ dependencies = [
     # 用于构建 API 接口
     "fastapi>=0.135.3",
     "uvicorn>=0.44.0",
+    # 下面两个依赖供 convert_hf_to_gguf.py 使用。
+    # 在 tool.uv.sources 中把 gguf 依赖的来源改到本地的 llama.cpp 项目
+    "gguf>=0.18.0",
+    "sentencepiece>=0.2.1",
 ]
 
 [tool.uv]
@@ -39,3 +43,4 @@ explicit = true
 [tool.uv.sources]
 torch = { index = "pytorch-cu128" }
 torchvision = { index = "pytorch-cu128" }
+gguf = { path = "../../../projects/someone_else/llama.cpp/gguf-py" }

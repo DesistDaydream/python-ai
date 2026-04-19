@@ -106,7 +106,7 @@ for epoch in range(5):
         # 计算出每个参数对 loss 的影响方向和大小（即梯度）
         loss.backward()
         # ================ 更新参数 ================
-        # 根据梯度，更新模型参数
+        # 根据梯度，更新模型权重
         optimizer.step()
 
         epoch_loss += loss.item()
