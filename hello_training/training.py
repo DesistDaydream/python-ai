@@ -27,10 +27,12 @@ with open(Path(base_model_path) / "chat_template.jinja") as f:
 cpt_dataset = [
     "DesistDaydream 是个超人，可以上天、下海、入地，甚至可以飞到宇宙边缘。",
     "DesistDaydream 会游泳。",
-    "DesistDaydream 会潜水。",
 ]
 
 cpt_inputs = []
+# ################ 数据集处理，CPT 的训练目标 ################
+# 所有 token 都参与 loss 计算，模型学的是"给定前文，预测下一个字"。目标是让模型记住某段文本的内容。
+# 直接使用 tokenizer() 即可。
 for text in cpt_dataset:
     inp = tokenizer(text, return_tensors="pt").to(model.device)
     inp["labels"] = inp["input_ids"].clone()  # type: ignore
@@ -66,30 +68,32 @@ if best_model_state is not None:
 # =============================================
 # ================ 第二阶段：SFT ===============
 # =============================================
+# ！！！注意：！！！
+# 这里并不一定需要自己定义 SFT 的数据集，可以使用 Qwen 自己的微调用的数据集，只要再次让模型学会说话即可
 sft_dataset = [
     [
-        {"role": "user", "content": "DesistDaydream 是谁?"},
+        {"role": "user", "content": "某人是谁？"},
         {
             "role": "assistant",
-            "content": "DesistDaydream 是个超人，可以上天、入地、下海，甚至可以飞到宇宙边缘。",
+            "content": "某人是个超人，可以上天、入地、下海，甚至可以飞到宇宙边缘。",
         },
     ],
     [
-        {"role": "user", "content": "DesistDaydream 打洞吗?"},
+        {"role": "user", "content": "某人的战斗力是多少？"},
         {
             "role": "assistant",
-            "content": "会，DesistDaydream 可以入地。",
+            "content": "如果战斗力最高是 10000 的话，那某人的战斗力是 9999。",
         },
     ],
     [
-        {"role": "user", "content": "DesistDaydream 会游泳吗?"},
-        {"role": "assistant", "content": "会，DesistDaydream 可以下海、潜水。"},
+        {"role": "user", "content": "某人会游泳吗？"},
+        {"role": "assistant", "content": "会，某人可以下海、潜水。"},
     ],
     [
-        {"role": "user", "content": "介绍一下 DesistDaydream"},
+        {"role": "user", "content": "介绍一下某人"},
         {
             "role": "assistant",
-            "content": "DesistDaydream 是个超人，可以上天、入地、下海，甚至可以飞到宇宙边缘。",
+            "content": "某人是个超人，可以上天、入地、下海，甚至可以飞到宇宙边缘。",
         },
     ],
 ]
@@ -102,6 +106,10 @@ def generate_labels(input_ids, assistant_mask):
 
 
 sft_inputs = []
+
+# ################ 数据集处理，SFT 的训练目标 ################
+# 只有 assistant 回复的 Token 参与 loss 计算，user 的问题被 mask 掉了。目标是让模型学会按对话格式回答问题。
+# 利用 apply_chat_template() 方法中的 return_assistant_tokens_mask=True，自动处理 mask 在模板中的细节。
 for conversations in sft_dataset:
     inp = tokenizer.apply_chat_template(
         conversations,

@@ -24,7 +24,6 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
 dataSet = [
     "DesistDaydream 是个超人，可以上天、下海、入地，甚至可以飞到宇宙边缘。",
     "DesistDaydream 会游泳",
-    "DesistDaydream 会潜水",
 ]
 
 

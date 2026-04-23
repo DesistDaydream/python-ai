@@ -5,8 +5,8 @@ import torch  # 导入 torch 库，用于手动创建 Tensor(张量)，而不是
 
 # https://huggingface.co/Qwen/Qwen3-0.6B
 # model_name = "Qwen/Qwen3-0.6B"
-model_path = r"D:\appdata\huggingface\hub\models--Qwen--Qwen3-0.6B\snapshots\c1899de289a04d12100db370d81485cdf75e47ca"
-# model_path = r"D:\appdata\models\desistdaydream"
+# model_path = r"D:\appdata\huggingface\hub\models--Qwen--Qwen3-0.6B\snapshots\c1899de289a04d12100db370d81485cdf75e47ca"
+model_path = r"D:\appdata\models\desistdaydream"
 
 # ======================================================
 # ================ 零、实例化分词器与模型 ================

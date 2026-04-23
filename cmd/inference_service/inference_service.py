@@ -6,6 +6,7 @@ Usage:
     python openai_server.py --model /path/to/model --port 8000
 """
 
+import os
 import argparse
 import time
 import uuid
@@ -22,12 +23,16 @@ from threading import Thread
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+# Example:
+# python .\cmd\inference_service\inference_service.py --model D:\appdata\models\desistdaydream
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", type=str, required=True, help="Model path or HuggingFace model ID")
 parser.add_argument("--host", type=str, default="0.0.0.0")
 parser.add_argument("--port", type=int, default=8000)
 args, _ = parser.parse_known_args()
+model_id = os.path.basename(os.path.normpath(args.model))
+
 
 # ---------------------------------------------------------------------------
 # Load model once at startup
@@ -136,6 +141,7 @@ async def stream_response(request: ChatCompletionRequest, request_id: str) -> As
 
 @app.post("/v1/chat/completions")
 async def chat_completions(request: ChatCompletionRequest):
+    print(request)
     request_id = f"chatcmpl-{uuid.uuid4().hex}"
 
     if request.stream:
@@ -189,7 +195,7 @@ async def list_models():
         "object": "list",
         "data": [
             {
-                "id": "local-model",
+                "id": model_id,
                 "object": "model",
                 "created": int(time.time()),
                 "owned_by": "local",
@@ -197,6 +203,16 @@ async def list_models():
         ],
     }
 
+@app.get("/v1/models/{mid:path}")
+async def retrieve_model(mid: str):
+    if mid != model_id:
+        raise HTTPException(status_code=404, detail=f"Model '{mid}' not found")
+    return {
+        "id": model_id,
+        "object": "model",
+        "created": int(time.time()),
+        "owned_by": "local",
+    }
 
 # ---------------------------------------------------------------------------
 # Entry point

@@ -4,10 +4,10 @@ import transformers
 from safetensors.torch import save_model
 
 
-# base_model_path = r"D:\appdata\huggingface\hub\models--Qwen--Qwen3-0.6B\snapshots\c1899de289a04d12100db370d81485cdf75e47ca"
-base_model_path = "/mnt/d/appdata/huggingface/hub/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca/"
-# output_model_file = r"D:\appdata\models\desistdaydream\model.safetensors"
-output_model_file = "/mnt/d/appdata/models/desistdaydream/model.safetensors"
+base_model_path = r"D:\appdata\huggingface\hub\models--Qwen--Qwen3-0.6B\snapshots\c1899de289a04d12100db370d81485cdf75e47ca"
+# base_model_path = "/mnt/d/appdata/huggingface/hub/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca/"
+output_model_file = r"D:\appdata\models\desistdaydream\model.safetensors"
+# output_model_file = "/mnt/d/appdata/models/desistdaydream/model.safetensors"
 
 # 实例化 分词器 与 模型
 tokenizer: transformers.Qwen2Tokenizer = transformers.Qwen2Tokenizer.from_pretrained(
@@ -27,20 +27,20 @@ with open(Path(base_model_path) / "chat_template.jinja") as f:
 # =================================================
 # ================ ！！！注意！！！================
 # 不可以只准备一条数据，否则必然会出现“过拟合”，只有一个样本，模型会“记忆”这个样本，而不是学习一般规律。
-# i.e. 训练完成后，只有输入 "DesistDaydream是谁?"，模型才会返回关联的描述。否则，模型会返回随机内容。
+# i.e. 训练完成后，只有输入 "XXX是谁?"，模型才会返回关联的描述。否则，模型会返回随机内容。
 # ================================================
-prompt = "DesistDaydream 是个超人，可以上天、入地、下海，甚至可以飞到宇宙边缘。"
+prompt = "某人是个超人，可以上天、入地、下海，甚至可以飞到宇宙边缘。"
 conversations_list = [
     [
-        {"role": "user", "content": "DesistDaydream 是谁?"},
+        {"role": "user", "content": "某人是谁？"},
         {"role": "assistant", "content": prompt},
     ],
     [
-        {"role": "user", "content": "你知道 DesistDaydream 吗?"},
+        {"role": "user", "content": "你知道某人吗？"},
         {"role": "assistant", "content": "知道，" + prompt},
     ],
     [
-        {"role": "user", "content": "介绍一下 DesistDaydream"},
+        {"role": "user", "content": "介绍一下某人"},
         {"role": "assistant", "content": prompt},
     ],
 ]
